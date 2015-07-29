@@ -30,9 +30,9 @@ x = fsk_real(1:512);
 load cs_csd_thres.mat
 
 % attr for cs sampling and sparse reconstruction 
-cs.sparse = 8;
-cs.ratio = 8;
-cs.iter = 32;
+cs.sparse = 16;
+cs.ratio = 4;
+cs.iter = 10;
 cs.N = length(x);
 cs.M = round(cs.N/cs.ratio);
 Phi = randn(cs.M,cs.N);
@@ -55,13 +55,23 @@ for m = 1:length(Pf)
         hatx = (dftmtx(cs.N))^-1 * recov;
 		% cs based csd function
 		[Spec, f, alpha] = my_cyclic_spectrum(hatx', cs.N, sig.fs, sig.M,'no-show', 'cs_based_cyclic_spectrum');
+		%feature range: f ~[-fs/4 fs/4]; a ~[0, a/4]
+		f_mid = round(length(f)/2);
+		f_index_range = (f_mid - floor(length(f)/2/3)+1) : (f_mid + floor(length(f)/2/3));
+		f_area = f(f_index_range);
+		a_index_range = 1 : (ceil(length(alpha) * 0.5));
+		a_area = alpha(a_index_range);
+		% feature extraction
+		y = (Spec(a_index_range,f_index_range));
+        energy_fin = (1/length(cs.N)).*norm(y);% test statistic (normlized)
+		%{
 		% main component
 		Spec_r = reshape(Spec, 1, length(f)* length(alpha));
 		sorted_spec = sort(Spec_r, 'descend'); 
 		main_spec = sorted_spec(1:10);
 		rest_spec = sorted_spec(11:end);
 		%test_stat = norm(main_spec) ./ norm(rest_spec);
-        energy_fin = (1/length(cs.N)).*norm(main_spec);% test statistic (normlized)
+		%}
 		% Theoretical value of Threshold, refer, Sensing Throughput Tradeoff in Cognitive Radio, Y. C. Liang
 		thresh(m) = cs_csd_thresh_est(m); %use estimated threshold to detect ofdm
 		if(energy_fin >= thresh(m))  
