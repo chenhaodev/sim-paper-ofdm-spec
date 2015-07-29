@@ -1,4 +1,5 @@
 #告訴Git忽略檔名
+*.doc
 *.pdf 
 *.png 
 *.html 
@@ -6,5 +7,5 @@
 *.zip 
 *.tgz 
 *.bmp 
-*.jpg'
+*.jpg
 bak/
