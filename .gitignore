@@ -1,4 +1,5 @@
 #告訴Git忽略檔名
+*.o
 *.mat
 *.doc
 *.pdf 
