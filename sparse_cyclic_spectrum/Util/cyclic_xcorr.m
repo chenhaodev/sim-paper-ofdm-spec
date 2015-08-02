@@ -93,19 +93,6 @@ for jj = 1:cs.N
 end
 Spec_f_cs = abs(W);
 
-%{
-% sparse reconstruction 2
-Pre = Phi'*Sy*Phi;
-D = dftmtx(cs.N);
-for ii = 1:cs.N
-	[hat(:,ii), ~] = cosamp(Pre(:,ii), D, cs.sparse, cs.iter);
-end
-for jj = 1:cs.N
-	[W(jj,:), ~] = cosamp(hat(jj,:)', D, cs.sparse, cs.iter);
-end
-Spec_f_cs = abs(W);
-%}
-
 % figure
 if strcmpi(opt1,'show')
 	figure;
