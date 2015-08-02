@@ -81,18 +81,6 @@ for alfa = tau(1:cs.M)
    	i = i+1;
 end
 
-%{
-% sparse reconstruction 1
-A = Phi * dftmtx(cs.N);
-for ii = 1:cs.M
-	[hat(:,ii), ~] = cosamp(Sy(:,ii), A, cs.sparse, cs.iter);
-end
-for jj = 1:cs.N
-	[W(jj,:), ~] = cosamp(hat(jj,:)', A, cs.sparse, cs.iter);
-end
-Spec_f_cs = abs(W);
-%}
-
 % sparse reconstruction 2
 Pre = Phi'*Sy*Phi;
 D = dftmtx(cs.N);
