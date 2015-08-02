@@ -40,6 +40,7 @@ for alfa = tau
 end
 
 Spec_t = abs(S);
+
 for ii = 1:N
 	%Y(ii,:) = simple_fft_tau(S(ii, :), N, tau);
     Y(ii,:) = fftshift(fft(S(ii, :)));
@@ -55,11 +56,12 @@ cs.ratio = 16;
 cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio);
-% sensing 1
-Phi = randn(cs.M,cs.N);
-% sensing 2
-%temp = toeplitz(randn(1,cs.N));
-%Phi = temp(1:cs.M, 1:cs.N);
+% sensing matrix 1
+%Phi = randn(cs.M,cs.N);
+% sensing matrix 2
+temp = toeplitz(randi([-1 1],1,cs.N));
+Phi = temp(1:cs.M, 1:cs.N);
+% sensing
 y = Phi*x;
 
 Sy = zeros(cs.M, cs.M); 
