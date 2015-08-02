@@ -1,4 +1,4 @@
-function [Spec, f, alpha] = cyclic_spectrum_new(x, N, fs, M, opt)
+function [Spec, f, alpha] = cyclic_spectrum(x, N, fs, M, opt)
 % cyclic spectrum analysis
 % x: signal (must be 1 * N vector)
 % N: samples <= len(x) 

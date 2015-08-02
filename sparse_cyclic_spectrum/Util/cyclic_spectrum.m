@@ -1,15 +1,17 @@
-function [Spec, f, alpha] = cyclic_spectrum_new(x, N, fs, M, opt)
+function [Spec, f, alpha] = cyclic_spectrum(x, N, fs, M, opt1, opt2)
 % cyclic spectrum analysis
 % x: signal (must be 1 * N vector)
 % N: samples <= len(x) 
 % fs: sample rate, [-fs/2 ~ fs/2]
 % M: window length 
-% author: chenhaomails@gmail.com
+% author: chenhaomails@gmail.como
+% opt1: 'show' => display picture
+% opt2: 'signal_len' => set only 1 window for all signal length
 
 win = 'hamming';
 
 d_alpha = fs/N; % freq resolution
-alpha = 0:d_alpha:fs; % cyclic resolution
+alpha = 0:d_alpha:fs-d_alpha; % cyclic resolution
 a_len = length(alpha); 
 
 f_len = floor(N/M-1)+1; 
@@ -35,19 +37,27 @@ for alfa = alpha
     t = reshape(t, M, f_N);
 
     % spectral correlation
-    X1 = X(t).*window_M;
-    X2 = X(t+interval_f_N).*window_M; 
-    St = conj(X1).*X2;
-    St = mean(St, 1); % T average
-    S(i, floor((f_len-f_N)/2)+(1:f_N)) = St/N; %move St to central
-    i = i+1;
-    
+	if strcmpi(opt2,'signal_len') % only 1 window
+    	X1 = X(t).*window_M';
+    	X2 = X(t+interval_f_N).*window_M'; 
+    	St = conj(X1).*X2;
+    	S(i, floor((f_len-f_N)/2)+(1:f_N)) = St/N; %move St to central
+    	i = i+1;
+	else
+		X1 = X(t).*window_M;
+    	X2 = X(t+interval_f_N).*window_M; 
+    	St = conj(X1).*X2;
+    	St = mean(St, 1); % T average
+    	S(i, floor((f_len-f_N)/2)+(1:f_N)) = St/N; %move St to central
+    	i = i+1;
+	end
 end
 
 Spec = abs(S);
 
 % figure
-if strcmpi(opt,'show')
+if strcmpi(opt1,'show')
+	figure;
     mesh(f, alpha, Spec); 
     axis tight;
     xlabel('f'); ylabel('a');    
