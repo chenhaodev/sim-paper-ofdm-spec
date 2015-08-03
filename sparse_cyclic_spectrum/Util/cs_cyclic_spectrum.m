@@ -1,4 +1,4 @@
-function [Spec_t, t_n, tau] = cyclic_xcorr(x, N, fs, opt1)
+function [Spec_f_cs, f, alpha] = cyclic_xcorr(x, N, fs, opt1)
 % x: signal (1 * N vector)
 % N: samples <= len(x) 
 % fs: sample rate
@@ -21,6 +21,10 @@ i = 1;
 X = fftshift(fft(x(1:N))); 
 X = X';
 x = x';
+
+%{
+
+%normal xcorr and cyclic_spec
 
 %% Loop
 for alfa = tau
@@ -48,11 +52,12 @@ for jj = 1:N
 	Z(:,jj) = fftshift(fft(Y(:, jj)));
 end
 Spec_f = abs(Z);
+%}
 
 % compressed xcorr
 cs.sparse = 16;
 cs.ratio = 16;
-cs.iter = 64;
+cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio);
 
@@ -84,7 +89,7 @@ for alfa = tau(1:cs.M)
 end
 
 % sparse reconstruction 2
-Pre = Phi'*Sy*Phi;
+Pre = pinv(Phi)*Sy*Phi;
 D = (dftmtx(cs.N))^(-1);
 for ii = 1:cs.N
 	[hat(:,ii), ~] = cosamp(Pre(:,ii), D, cs.sparse, cs.iter);
@@ -97,6 +102,15 @@ Spec_f_cs = abs(W);
 
 % figure
 if strcmpi(opt1,'show')
+	d_alpha = fs/N; % freq resolution
+	alpha = 0:d_alpha:fs-d_alpha; % cyclic resolution
+	a_len = length(alpha); 
+	f_len = floor(N/M-1)+1; 
+	f = -(fs/2-d_alpha*floor(M/2)) + d_alpha*M*(0:f_len-1); % freq sample location
+%{
+
+%normal xcorr and cyclic_spec
+
 	figure;
     mesh(t_n, tau, Spec_t); 
     axis tight;
@@ -110,6 +124,7 @@ if strcmpi(opt1,'show')
     mesh(f, alpha, Spec_f); 
     axis tight;
     xlabel('f'); ylabel('a');    
+%}
 	figure;
     mesh(f, alpha, Spec_f_cs); 
     axis tight;
