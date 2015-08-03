@@ -1,0 +1,94 @@
+* cs_spec_xcorr_v20150803143333
+  cs_xcorr_vector
+  master
+v20150803143333
+v20150803144306
+commit a4bdc246c78824746465667b990b8ee75a1f9979
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 17:21:33 2015 +0800
+
+    create feature extraction, but fail to diff useful signal and noise
+
+commit 059c000ac0386cb60b2030713c7473cdee7bbcb3
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 14:36:53 2015 +0800
+
+    updated, sparse ok, but slow
+
+commit e2eaa89eec69dda0736e566b2681659fc52550ce
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 21:17:18 2015 +0800
+
+    sparse recon2 > recon1, but still not good enough
+
+commit f977f2bfbeb2211688803954bbd809db77853af8
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 21:14:29 2015 +0800
+
+    readme
+
+commit af106953d53be20356f79f15be7a76a9450c8f4c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 21:08:45 2015 +0800
+
+    sparse recon 2, try
+
+commit 9e6271c3692feabbafa42045fe854a3599133fac
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 16:47:09 2015 +0800
+
+    xcorr in time & freq
+
+commit 6120d6d858fd058009519ec1848dd2659c1fc897
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Fri Jul 31 15:55:21 2015 +0800
+
+    create sparse cyclic analysis
+
+commit b162da4586bea9e1854064b57c58d869c4f9e147
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 19:41:13 2015 +0800
+
+    updated gitignore
+
+commit d903115ae0ebc7c40d90cebd98df34f975184fa9
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 19:39:49 2015 +0800
+
+    update for dctmtx representation, fail
+
+commit cf079dfdea2e94868bc6268e3020f7dc913e5ea2
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 15:26:55 2015 +0800
+
+    create cs cyclic spectrum
+
+commit 9700f397ba0f965b4904eb7d525e5251362afac7
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 15:19:45 2015 +0800
+
+    create ofdm simple system (v0.1)
+
+commit 93578d0586439cb69c0799a4d7f6d7bc585ea947
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 15:14:02 2015 +0800
+
+    create CSP detection (without recovery)
+
+commit 0d0b42a7739aeb67017908b5161ba072b512a340
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 15:12:53 2015 +0800
+
+    update .gitignore
+
+commit 5192d6c007bf3466777125ed7ace21bb85f48502
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 15:12:01 2015 +0800
+
+    create FD (cyclic_spectral)
+
+commit c78ca89e7464f0beeb9cef93b8e2f24a4962cf6c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Jul 29 14:54:29 2015 +0800
+
+    create ED and OFDM_chan
