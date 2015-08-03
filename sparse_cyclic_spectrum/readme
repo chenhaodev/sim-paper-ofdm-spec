@@ -1,8 +1,21 @@
-* cs_spec_xcorr_v20150803143333
+* cs_spec_kron
+  cs_spec_xcorr_v20150803143333
   cs_xcorr_vector
   master
 v20150803143333
 v20150803144306
+commit bb594660fd74cc052418bbaa9c8819c7389c363c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:11:37 2015 +0800
+
+    try alter recov by cvx/cosamp, fail; try 1 side recov (Rz*inv(D'A') = ADS), fail
+
+commit 3475fd7457576d19135592c608ceca9d197ec8dc
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 17:29:42 2015 +0800
+
+    create git readme
+
 commit a4bdc246c78824746465667b990b8ee75a1f9979
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Mon Aug 3 17:21:33 2015 +0800
