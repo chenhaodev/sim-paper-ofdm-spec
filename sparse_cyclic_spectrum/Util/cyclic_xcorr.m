@@ -55,11 +55,13 @@ cs.ratio = 16;
 cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio);
+
 % sensing 1
-Phi = randn(cs.M,cs.N);
+%Phi = randn(cs.M,cs.N);
 % sensing 2
-%temp = toeplitz(randn(1,cs.N));
-%Phi = temp(1:cs.M, 1:cs.N);
+temp = toeplitz(randn(1,cs.N));
+Phi = temp(1:cs.M, 1:cs.N);
+
 y = Phi*x;
 
 Sy = zeros(cs.M, cs.M); 
@@ -83,13 +85,14 @@ end
 
 % sparse reconstruction 2
 Pre = Phi'*Sy*Phi;
-D = dftmtx(cs.N);
+D = (dftmtx(cs.N))^(-1);
 for ii = 1:cs.N
 	[hat(:,ii), ~] = cosamp(Pre(:,ii), D, cs.sparse, cs.iter);
 end
 for jj = 1:cs.N
 	[W(jj,:), ~] = cosamp(hat(jj,:)', D, cs.sparse, cs.iter);
 end
+W = fftshift(W);
 Spec_f_cs = abs(W);
 
 % figure
