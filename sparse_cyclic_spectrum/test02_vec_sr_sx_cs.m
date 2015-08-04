@@ -150,7 +150,7 @@ end
 %%% In the Real World
 Cy = y*y'; %covariance matrix (W/O sum)
 %%% Focus !! why Rz != Phi*Rx*Phi' ??? Use half_mask to check
-half_mask = rot90(tril(ones(N,N),-1));
+half_mask = rot90(triu(ones(cs.M,cs.M),0));
 Cy_r = Cy .* half_mask;
 
 Ry_r = reshape(Cy_r, 1, cs.M*cs.M);
