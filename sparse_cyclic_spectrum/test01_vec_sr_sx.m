@@ -20,13 +20,8 @@ fs = sig.fs;
 N = sig.N;
 x = sig.x;
 opt1 = 'show';
-%[Spec_cs, Spec, f, a] = cs_cyclic_spectrum(sig.x, sig.N, sig.fs, 'show'); 
-%function [Spec_f_cs, Spec_f, f, alpha] = cs_cyclic_spectrum(x, N, fs, opt1)
-% x: signal (1 * N vector)
-% N: samples <= len(x) 
-% fs: sample rate
-% author: chenhaomails@gmail.com
-% opt1: 'show' => display picture
+
+%% cyclic spec generate
 
 M = 1;
 
@@ -47,7 +42,7 @@ x = x';
 
 %normal xcorr and cyclic_spec
 
-%% Loop
+% Loop
 for alfa = tau
 
     interval_tau = round(alfa/d_tau); % tau
@@ -65,26 +60,32 @@ for alfa = tau
 end
 
 Spec_t = abs(S);
-%for ii = 1:N
-%	%Y(ii,:) = simple_fft_tau(S(ii, :), N, tau);
-%    Y(ii,:) = fftshift(fft(S(ii, :)));
-%end
-%for jj = 1:N
-%	Z(:,jj) = fftshift(fft(Y(:, jj)));
-%end
 D = dftmtx(N);
 W = D*S*D;
 Z = fftshift(W);
 Spec_f = abs(Z);
 
+% equivalent
+%{
+for ii = 1:N
+    Y(ii,:) = fftshift(fft(S(ii, :)));
+end
+for jj = 1:N
+	Z(:,jj) = fftshift(fft(Y(:, jj)));
+end
+%}
 
 %% test begin
-Sf_r = reshape(Z, 1, 64*64);
-S_r = reshape(S, 1, 64*64);
-B_r = eye(4096);
-H_r = kron((eye(64))',D./64)*B_r;
-H_inv_r = (H_r)^(-1);
-save H_inv_r_64.mat H_inv_r
-D_r = kron((dftmtx(64))', eye(64));
-t1 = H_inv_r*D_r*S_r';
-plot(Sf_r, 'o'); hold on; plot(t1, '*');
+Sx_r = reshape(Z, 1, 64*64); %reshape the cyclic spectrum
+Rx_r = reshape(S, 1, 64*64); %reshape the xcorr (time)
+B = eye(4096);
+H = kron((eye(64))',D./64)*B;
+H_inv = (H)^(-1);
+save H_inv_64.mat H_inv
+W_r = kron((dftmtx(64))', eye(64));
+t1 = H_inv*W_r*Rx_r';
+plot(Sx_r, 'o'); hold on; plot(t1, '*'); 
+t1_m = (vec2mat(t1, 64, 64))';
+figure; mesh(abs(t1_m));
+
+
