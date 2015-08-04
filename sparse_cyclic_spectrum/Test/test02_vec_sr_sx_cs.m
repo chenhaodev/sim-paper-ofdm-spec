@@ -43,6 +43,7 @@ x = x';
 %normal xcorr and cyclic_spec
 
 % Loop
+%{
 for alfa = tau
 
     interval_tau = round(alfa/d_tau); % tau
@@ -65,7 +66,16 @@ W = D*S*D;
 Z = fftshift(W);
 Spec_f = abs(Z);
 Dct = dctmtx(N);
-Wct = Dct * S * Dct;
+Sx = Dct * S * Dct;
+%}
+
+% close equivalent cyclic spectrum
+Dct = dctmtx(N);
+Dft = dftmtx(N);
+D = Dct;
+Rx = x*x';
+Sx = D*Rx*D;
+%figure; mesh(abs(Sx))
 
 % equivalent
 %{
@@ -79,34 +89,18 @@ end
 
 %% test begin
 
-%{
-Sx_r = reshape(W, 1, N*N); %reshape the cyclic spectrum
-Rx_r = reshape(S, 1, N*N); %reshape the xcorr (time)
+% Dct matrix
+Sx_r = reshape(Sx, 1, N*N); %reshape the cyclic spectrum
+Rx_r = reshape(Rx, 1, N*N); %reshape the xcorr (time)
 B = eye(N^2);
-H = kron((eye(N))',D)*B;
-W_r = kron((inv(dftmtx(N)))', eye(N));
-%{
-t1 = W_r*Sx_r';
-t2 = H*Rx_r';
-figure; plot(t1, 'o'); hold on; plot(t2, '*');
-% Now H*Rx_r' = W_r*Sx_r';
-% So Rx_r' = H_inv * W_r*Sx_r'
-%}
-H_inv = ((H'*H)^(-1))*H';
-%}
-
-Sx_r = reshape(Wct, 1, N*N); %reshape the cyclic spectrum
-Rx_r = reshape(S, 1, N*N); %reshape the xcorr (time)
-B = eye(N^2);
-H = kron((eye(64))',Dct)*B;
-W_r = kron((inv(dctmtx(N)))', eye(N));
+H = kron((eye(64))',D)*B;
+W_r = kron((inv(D))', eye(N));
 t1 = W_r*Sx_r';
 t2 = H*Rx_r';
 %figure; plot(t1, 'o'); hold on; plot(t2, '*');
 % Now H*Rx_r' = W_r*Sx_r';
 % So Rx_r' = H_inv * W_r*Sx_r'
 H_inv = ((H'*H)^(-1))*H';
-
 
 % compressed xcorr
 cs.sparse = 16;
@@ -115,14 +109,8 @@ cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio);
 
-% sensing 1
-Phi = randn(cs.M,cs.N) + randn(cs.M,cs.N).*sqrt(-1);
-
-% sensing 2
-% temp = toeplitz(randn(1,cs.N));
-% Phi = temp(1:cs.M, 1:cs.N);
-% Phi = Phi./norm(Phi);
-
+% sensing (random matrix)
+Phi = randn(cs.M,cs.N);
 y = Phi*x;
 
 %{
@@ -149,13 +137,12 @@ end
 
 %%% In the Real World
 Cy = y*y'; %covariance matrix (W/O sum)
-%%% Focus !! why Rz != Phi*Rx*Phi' ??? Use half_mask to check
-half_mask = rot90(triu(ones(cs.M,cs.M),0));
-Cy_r = Cy .* half_mask;
-
-Ry_r = reshape(Cy_r, 1, cs.M*cs.M);
-PHI = eye((N/cs.ratio)^2)*kron(Phi,Phi)*eye(N^2);
-A = PHI*H_inv*W_r;
+% Rx = x*x';   Phi*Rx*Phi' = Phi*x*x'*Phi' = y*y' = Cy;
+% since: Rx => S in cyclic_spectrum.m <= Rx
+% H*Rx_r' = W_r*Sx_r';
+% Ry_r = kron(Phi,Phi)*Rx_r'; 
+Ry_r = reshape(Cy, 1, cs.M*cs.M);
+A = kron(Phi,Phi)*H_inv*W_r;
 b = Ry_r';
 %[hat, ~] = cosamp(b, A, 32, 100);
 
@@ -165,7 +152,7 @@ cvx_begin
     A*hatX == b;
 cvx_end
 hat_m = (vec2mat(hatX, N, N))';
-figure; mesh(abs(fftshift(hat_m)));
+figure; mesh(abs(hat_m));
 
 
 %{
