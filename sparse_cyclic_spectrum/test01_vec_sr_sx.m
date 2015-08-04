@@ -64,6 +64,8 @@ D = dftmtx(N);
 W = D*S*D;
 Z = fftshift(W);
 Spec_f = abs(Z);
+Dct = dctmtx(N);
+Wct = Dct * S * Dct;
 
 % equivalent
 %{
@@ -76,16 +78,46 @@ end
 %}
 
 %% test begin
-Sx_r = reshape(Z, 1, 64*64); %reshape the cyclic spectrum
-Rx_r = reshape(S, 1, 64*64); %reshape the xcorr (time)
-B = eye(4096);
-H = kron((eye(64))',D./64)*B;
-H_inv = (H)^(-1);
-save H_inv_64.mat H_inv
-W_r = kron((dftmtx(64))', eye(64));
-t1 = H_inv*W_r*Rx_r';
-plot(Sx_r, 'o'); hold on; plot(t1, '*'); 
-t1_m = (vec2mat(t1, 64, 64))';
-figure; mesh(abs(t1_m));
 
+
+Sx_r = reshape(Wct, 1, N*N); %reshape the cyclic spectrum
+Rx_r = reshape(S, 1, N*N); %reshape the xcorr (time)
+B = eye(N^2);
+H = kron((eye(N))',Dct)*B;
+W_r = kron((inv(dctmtx(N)))', eye(N));
+t1 = W_r*Sx_r';
+t2 = H*Rx_r';
+figure; plot(t1, 'o'); hold on; plot(t2, '*');
+% Now H*Rx_r' = W_r*Sx_r';
+% So Rx_r' = H_inv * W_r*Sx_r'
+%H_inv = pinv(H);
+%save H_inv_N.mat H_inv
+H_inv = ((H'*H)^(-1))*H';
+t3 = H_inv * W_r*Sx_r'; 
+figure; plot(t3, 'o'); hold on; plot(Rx_r', '*');
+t3_m = (vec2mat(t3, N, N))';
+figure; mesh(abs(t3_m));
+t4_m = (vec2mat(Sx_r, N, N))';
+figure; mesh(abs(t4_m));
+
+
+%{
+Sx_r = reshape(W, 1, N*N); %reshape the cyclic spectrum
+Rx_r = reshape(S, 1, N*N); %reshape the xcorr (time)
+B = eye(N^2);
+H = kron((eye(N))',D)*B;
+W_r = kron((inv(dftmtx(N)))', eye(N));
+t1 = W_r*Sx_r';
+t2 = H*Rx_r';
+figure; plot(t1, 'o'); hold on; plot(t2, '*');
+% Now H*Rx_r' = W_r*Sx_r';
+% So Rx_r' = H_inv * W_r*Sx_r'
+%H_inv = pinv(H);
+%save H_inv_N.mat H_inv
+H_inv = ((H'*H)^(-1))*H';
+t3 = H_inv * W_r*Sx_r'; 
+figure; plot(real(t3), 'o'); hold on; plot(real(Rx_r'), '*');
+t3_m = (vec2mat(t3, N, N))';
+figure; mesh(abs(t3_m));
+%}
 
