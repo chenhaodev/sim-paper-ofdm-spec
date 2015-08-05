@@ -4,6 +4,60 @@
   master
 v20150803143333
 v20150803144306
+commit 4c9628128dda458dcd4ae64426d2040342383c4f
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 5 02:33:28 2015 +0800
+
+    cs.vec{xcorr} => cs.vec{Sf}.. sparse OK, but recon-spec not foucs..? (disp_sparse_...m)
+
+commit 960b23cd2119d9702ee38b2b82e942c8d3b07a70
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 22:15:08 2015 +0800
+
+    test02, testing ...
+
+commit c32581e5fd5d6db98c0b5775392beb531b34e13e
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 22:08:51 2015 +0800
+
+    updated: test01 vec{xcorr} => A vec{Sf}; test02: cs.vec{xcorr} => cs.vec{Sf}, testing .. focus on why Rz != ARA'
+
+commit 4b9dc68eaf2f17effc7477b575c87f3472df575b
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 15:28:29 2015 +0800
+
+    test01_vec_sr_sx.m updated
+
+commit d829fead63db751fc755d90ba4fde1eb02e317c1
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 14:21:04 2015 +0800
+
+    test vec{xcorr} => A vec{Sf} suc .. OK
+
+commit f9f293e3f61498d8c7c15cd3f73ff3f13a3195e7
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 12:59:48 2015 +0800
+
+    test_func scripts created
+
+commit 2a83e8d350eedd0d7d57826e18d9d0880cef96c0
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:28:21 2015 +0800
+
+    update
+
+commit cf9040687c70837b68869f7998c964393e54fb9a
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:23:56 2015 +0800
+
+    failed exp log, sparse_cyclic_spectrum
+
+commit f8f061e9f8cce25f692d23e24510e4dbe9c8e2cb
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:11:57 2015 +0800
+
+    update readme
+
 commit bb594660fd74cc052418bbaa9c8819c7389c363c
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Mon Aug 3 22:11:37 2015 +0800

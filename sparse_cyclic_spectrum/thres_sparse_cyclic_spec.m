@@ -1,16 +1,16 @@
-% calculate the threhsold in cyclic feature detection by simulations. 
+% calculate the threhsold in cs based detection for cyclostationary signal 
 % 1. assume only noise is received, i.e., primary user is absent.
 % false alarm, then
 % 2. probability of false alarm = energy above threshold/No. of iteration.
-% by chenhaomails@gmail.com
-% ver 0.1
-
-% header
+% author: chenhaomails@gmail.com
+% update: 15/08/05
 
 clc; clear; close all
 
 addpath('./Util/')
 addpath('./Data/')
+
+% Header 
 
 sig.type = 'fsk'; % 'fsk'
 sig.fs = 1;
@@ -22,34 +22,31 @@ else
 	error('signal type not exist!!');
 end
 
-sig.x = fsk_real;
+sig.x = fsk_real(1:64);
+%sig.x = fsk_real(65:128);
 sig.N = length(sig.x);
 
-snr_dB = -10; % SNR in decibels
-snr = 10.^(snr_dB./10); % Linear Value of SNR
-
 Pf = 0.01:0.01:1; % Pf = Probability of False Alarm
-iter = 25; % Monte Carlo simulation
+iter = 5; % Monte Carlo simulation
 
 %% Loop %%
 for tt = 1:length(Pf)
     tt
 	for kk=1:iter 
-		% noise1
-		n=(randn(1,sig.N)+sqrt(-1)*randn(1,sig.N))./(sqrt(2)); % complex noise
+		% noise
+		n= randn(1,sig.N); 
 		sig.x = n;
-		% test-core
-		[Spec_cs, f, alpha] = cyclic_xcorr(sig.x, sig.N, sig.fs, 'non-show'); 
-		% feature-extract
-		[feature_o, ~] = feature_test(Spec_cs, f, [-0.25 +0.25], alpha, [-0.15 +0.15]) 
+		% test, cs_cyc_spec + feature extract
+		[hat_spec] = sparse_cyclic_spec(sig.x, sig.N, sig.fs, 'non-show');
+		[out] = feature_extract(abs(hat_spec), 1:sig.N, 0.2, 1:sig.N, 0.2);
 		% energy 
-        energy_fin(kk) = (1/length(sig.N)).*norm(feature_o);% test statistic (normlized)
+        energy_fin(kk) = (1/length(sig.N)).*norm(out);% test statistic (normlized)
 	end
 	energy_desc = sort(energy_fin,'descend'); % arrange values in descending order
 	thresh(tt) = energy_desc(ceil(Pf(tt)*iter)); % largest thres to avoid 'Pf(tt)' in each 'iter' group
 end
 plot(thresh, Pf, 'ob')
 hold on
-cs_csd_thresh_est = thresh;
-save ./Data/cs_csd_thres.mat cs_csd_thresh_est
+thres_sparse_cyclic_spec_est = thresh;
+save ./Data/thres_sparse_cyclic_spec.mat thres_sparse_cyclic_spec_est
 
