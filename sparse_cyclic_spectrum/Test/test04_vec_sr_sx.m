@@ -39,81 +39,69 @@ t_n = -(fs/2-d_tau*floor(M/2)) + d_tau*M*(0:t_len-1); % freq sample location
 S = zeros(tau_len, t_len); 
 i = 1; 
 
-X = fftshift(fft(x(1:N))); % signal fft
-X = X';
 x = x';
 
 % Equivalent cyclic spectrum
 % Rx = x*x' <=> S in cyclic_spectrum.m 
 Dft = dctmtx(N);%dftmtx(N);
-D = fftshift(Dft); % choose DFT matrix
-Rx = conj(x)*x';
-Sx = conj(D)*Rx*D';
-
-%figure; mesh(abs(Sx))
+%D = fftshift(Dft); % choose DFT matrix
+D = Dft;
+Rx = x*x';
+Sx = D*Rx*D;
 
 % Vectorize xcorr and cyclic spectrum
-matrix_load = 'yes';
+matrix_load = 'no';
 Sx_r = reshape(Sx, 1, N*N); %reshape the cyclic spectrum
 Rx_r = reshape(Rx, 1, N*N); %reshape the xcorr
-if strcmpi(matrix_load,'yes') % default signal
-	load ./Data/matrix_load_64_8_dct.mat % load D, B, H, W_r, H_inv, cs (attr)
-else
-%{
-tempA = reshape(triu(Rx), 1, N*N);
-inxA = find(tempA ~= 0);
-Rx_tr = Rx_r(inxA);
-B = Rx_r' * Rx_tr ./( norm(Rx_tr)* norm(Rx_tr));
-Pn = B;
-H = kron((eye(N))',D)*B;
-W_r = kron((inv(D))', eye(N));
-H_inv = ((H'*H)^(-1))*H';
-%}
 B = eye(N^2);
 H = kron((eye(N))',D)*B;
 W_r = kron((inv(D))', eye(N));
-H_inv = ((H'*H)^(-1))*H';
+H_inv = ((H'*H)^(-1))*H'; %rank(H) = 4096;
+
+% assert: 
+t1a = W_r*Sx_r';
+t1b = H*Rx_r';
+if ( (norm(t1a - t1b) / length(t1a)) < 0.0001)
+    disp('test: H*Rx_r == W_r*Sx_r (?) ... yes');
+else
+    error('test: H*Rx_r == W_r*Sx_r (?) ... no');
 end
-%figure; plot(W_r*Sx_r', 'o'); hold on; plot(H*Rx_r', '*'); %Now H*Rx_r' = W_r*Sx_r';
+t2a = H_inv*W_r*Sx_r';
+t2b = Rx_r';
+if ( (norm(t2a - t2b) / length(t2a)) < 0.0001)
+    disp('test: Rx_r == H_inv*W_r*Sx_r (?) ... yes');
+else
+    error('test: Rx_r == H_inv*W_r*Sx_r (?) ... no');
+end
 
 % Compressed sampling the signal
 cs.sparse = 16;
-cs.ratio = 8;
+cs.ratio = 4;
 cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio); % num of sensing points
-%if strcmpi(matrix_load,'yes') % default signal
-%    y = Phi*x;
-%else
-%Phi = randn(cs.M,cs.N); % sensing (random matrix)
 Phi = pn_gen(cs.M,cs.N);
-%end
 y = Phi*x;
+Cy = y*y'; %covariance matrix (via compressed data)
+Cy_r = reshape(Cy, 1, cs.M*cs.M);
+A = kron(Phi,Phi)*H_inv*W_r; % equivalent sensing matrix for CS
+b = Cy_r';
 
+% assert: 
+t3a = A*Sx_r';
+t3b = b;
+if ( (norm(t3a - t3b) / length(t3a)) < 0.0001)
+    disp('test: Cy_r = A*Sx_r (?) ... yes');
+else
+    error('test: Cy_r = A*Sx_r (?) ... no');
+end
 
 % Link compressed covariance and vectorized cyclic spectrum 
-% 1 Phi*conj(x)*x'*Phi' = Phi*Rx*Phi' =conj(y)*y' = Cy; ..ok
+% 1 Phi*x*x'*Phi' = Phi*Rx*Phi' =y*y' = Cy; ..ok
 % 2. H*Rx_r' = W_r*Sx_r'; ..ok
 % 3. Cy_r' = kron(Phi,Phi)*Rx_r'; .. ok
 % so Cy_r' = kron(Phi,Phi)*H_inv*W_r*Rx_r', where Rx_r is sparse;
 % Problem: sparse hat_m is not concentrated!
-%Cy = conj(y)*y'; %covariance matrix (via compressed data)
-
-%{
-Cy = y*y'; %covariance matrix (via compressed data)
-Cy_r = reshape(Cy, 1, cs.M*cs.M);
-tempB = reshape(triu(Cy), 1, cs.M*cs.M);
-inxB = find(tempB ~= 0);
-Cy_tr = Cy_r(inxB);
-Qm = Cy_tr' * Cy_r ./( norm(Cy_r)* norm(Cy_r));
-A = Qm*kron(Phi,Phi)*Pn*H_inv*W_r;
-b = Cy_tr';
-%}
-Cy = conj(y)*y'; %covariance matrix (via compressed data)
-Cy_r = reshape(Cy, 1, cs.M*cs.M);
-K = kron(D', eye(N));
-A = kron(Phi,Phi)*H_inv*W_r*K;
-b = Cy_r';
 
 cvx_begin
     variable hatX(N^2);
@@ -122,7 +110,6 @@ cvx_begin
 cvx_end
 hat_m = (vec2mat(hatX, N, N))';
 figure; mesh(abs(hat_m));
-figure; mesh(abs(hat_m(1:N/2, 1:N/2)));
 
 % Extract feature energy from recov spectrum
 %[out] = feature_extract(abs(hat_m), 1:N, 0.2, 1:N, 0.2);

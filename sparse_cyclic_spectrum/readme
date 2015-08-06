@@ -4,6 +4,24 @@
   master
 v20150803143333
 v20150803144306
+commit 622ffc54781d20b014b210348392a0192dadda18
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 6 13:35:49 2015 +0800
+
+    updated gitignore
+
+commit 4358616ed874717892bf3750d000a57f36918c00
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 6 13:19:57 2015 +0800
+
+    since recon-spec not foucs via DCTmtx... try DFTmtx to solve it(maybe is not sparse enough)
+
+commit 550cb44884ddfe278c85961e6a8b7aa2838d9fba
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 5 13:45:01 2015 +0800
+
+    although recon-spec not foucs... fixed Phi (sensing matrix) to assume it focused
+
 commit 4c9628128dda458dcd4ae64426d2040342383c4f
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Wed Aug 5 02:33:28 2015 +0800
