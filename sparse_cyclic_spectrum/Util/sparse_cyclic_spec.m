@@ -40,18 +40,15 @@ cs.ratio = 8;
 cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio); % num of sensing points
-if strcmpi(matrix_load,'yes') % default signal
-    y = Phi*x;
-else
+
 Phi = randn(cs.M,cs.N); % sensing (random matrix)
-end
 y = Phi*x;
 
 % Link compressed covariance and vectorized cyclic spectrum 
 % 1. Phi*Rx*Phi' = Phi*x*x'*Phi' = y*y' = Cy;
 % 2. H*Rx_r' = W_r*Sx_r';
-% 3. Ry_r = kron(Phi,Phi)*Rx_r'; 
-% so Ry_r = kron(Phi,Phi)*H_inv*W_r*Rx_r', where Rx_r is sparse;
+% 3. Ry_r' = kron(Phi,Phi)*Rx_r'; 
+% so Ry_r' = kron(Phi,Phi)*H_inv*W_r*Sx_r', where Rx_r is sparse;
 % Problem: sparse hat_m is not concentrated!
 % Trick: fix the sensing random matrix.
 Cy = y*y'; %covariance matrix (via compressed data)
@@ -59,11 +56,15 @@ Ry_r = reshape(Cy, 1, cs.M*cs.M);
 A = kron(Phi,Phi)*H_inv*W_r;
 b = Ry_r';
 
+
 cvx_begin quiet
     variable hatX(N^2);
     minimize(norm(hatX,1));
     A*hatX == b;
+    %subject to
+    %    norm( A * hatX - b, 2 ) <= 0.0001;
 cvx_end
+
 hat_m = (vec2mat(hatX, N, N))';
 if strcmpi(opt1,'show') 
 	figure; mesh(abs(hat_m));

@@ -21,6 +21,7 @@ end
 
 sig.x = fsk_real(1:64);
 %sig.x = fsk_real(65:128);
+sig.x = sig.x ./ norm(sig.x);
 sig.N = length(sig.x);
 n=(randn(1,sig.N)); 
 

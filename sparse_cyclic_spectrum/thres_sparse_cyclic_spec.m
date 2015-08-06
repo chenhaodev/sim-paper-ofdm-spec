@@ -27,7 +27,7 @@ sig.x = fsk_real(1:64);
 sig.N = length(sig.x);
 
 Pf = 0.01:0.01:1; % Pf = Probability of False Alarm
-iter = 5; % Monte Carlo simulation
+iter = 10; % Monte Carlo simulation
 
 %% Loop %%
 for tt = 1:length(Pf)
