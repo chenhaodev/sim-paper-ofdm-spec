@@ -4,6 +4,18 @@
   master
 v20150803143333
 v20150803144306
+commit 09ed0813a581fe35237b1df473276f759b9fcaf4
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 8 15:27:35 2015 +0800
+
+    revise mtx H, but Sth wrong here, since Eye_tmp(k,k) should correspond to G(k), while we use D instead.
+
+commit 6d9b2267118987f44ff7da57cc1ca53b2b03764f
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 6 15:42:27 2015 +0800
+
+    create assert()
+
 commit 622ffc54781d20b014b210348392a0192dadda18
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Thu Aug 6 13:35:49 2015 +0800
