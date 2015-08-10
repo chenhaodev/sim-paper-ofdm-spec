@@ -49,6 +49,9 @@ D = Dft;
 Rx_o = x*x';
 %Sx = D*Rx*D;
 
+
+%the following canbe optimised !!!
+
 %R generation, ref[1].eq(7)
 Rx = zeros(N,N);
 for nn = 1:N
@@ -56,6 +59,52 @@ for nn = 1:N
 		%Rx(nn,v) = x(nn)* x(mod(nn+v-1, N));
         Rx(nn,v) = x(nn)* x(nn+v-1);
 	end
+end
+
+%vec{R} generate, ref[1].eq(8)
+B = [];
+tmp = eye(N*N);
+for nn = 1:N
+	for v = 1:(N-nn+1) 
+		q = (v-1)*N + (nn-1) + 1;  %q = nN + v, ~[0, N-1] => ~[1,N]
+		B = [B, tmp(:, q)];
+	end
+end
+
+%Pn, Qm generate, ref[1].eq(43,44)
+Pn = zeros(N*N, N*(N+1)/2);
+Qn = zeros(N*N, N*(N+1)/2); %what's kron delta?
+for v = 1:N
+	for nn = 1:(N-v+1)  %eq(43)
+		p = (v-1)*N - (v-1)*(v-2)/2 + (nn-1) + 1;
+		q1 = (v-1+nn-1)*N + (nn-1) + 1;  %eq(42)
+		q2 = (nn-1)*N + (nn-1) + (v-1) + 1;  
+		Pn(q1, p) = 1; Pn(q2, p) = 1;
+		if (v == 1)
+			kron_delta = 1;
+		else
+			kron_delta = 0;
+		end 
+		Qn(p,q1) = 1; Qn(p,q2) = 1/2 + (1/2)*kron_delta;
+	end
+end
+
+%rx generate, ref[1].eq(8)
+rx = [];
+for nn = 1:N
+	for v = 1:(N-nn+1) 
+		tmp = Rx(nn,v);
+		rx = [rx, tmp];
+	end
+end
+
+% assert: 
+t0a = B*rx'; 
+t0b = reshape(Rx, 1, N*N);
+if ( (norm(t0a - t0b') / length(t0a)) < 0.003)
+    disp(' vec{R} = B*rx (?) ... yes');
+else
+    error(' vec{R} = B*rx (?) ... no');
 end
 
 %generate cyclic spectrum 
@@ -81,8 +130,8 @@ Sx = Sx_tmp*D; %ref[1].eq(10), but eq(12) says vec{Sx * F^-1}... ?
 % Vectorize xcorr and cyclic spectrum
 matrix_load = 'no';
 Sx_r = reshape(Sx, 1, N*N); %reshape the cyclic spectrum
-Rx_r = reshape(Rx, 1, N*N); %reshape the xcorr
-B = eye(N^2);
+%rx = reshape(Rx, 1, N*N); %reshape the xcorr
+%B = eye(N^2);
 %H = kron((eye(N))',D)*B;
 H_tmp = zeros(N^2,N^2);
 for v = 1:N % calculate the matrix that map Rx => Sx_tmp_sum
@@ -96,18 +145,18 @@ H_inv = ((H'*H)^(-1))*H'; %rank(H) = 4096;
 
 % assert: 
 t1a = W_r*Sx_r'; 
-t1b = H*Rx_r';
+t1b = H*rx';
 if ( (norm(t1a - t1b) / length(t1a)) < 0.003)
-    disp('test: H*Rx_r == W_r*Sx_r (?) ... yes');
+    disp('test: H*rx == W_r*Sx_r (?) ... yes');
 else
-    error('test: H*Rx_r == W_r*Sx_r (?) ... no');
+    error('test: H*rx == W_r*Sx_r (?) ... no');
 end
 t2a = H_inv*W_r*Sx_r';
-t2b = Rx_r';
+t2b = rx';
 if ( (norm(t2a - t2b) / length(t2a)) < 0.003) % problem, not pass, why ?
-    disp('test: Rx_r == H_inv*W_r*Sx_r (?) ... yes');
+    disp('test: rx == H_inv*W_r*Sx_r (?) ... yes');
 else
-    error('test: Rx_r == H_inv*W_r*Sx_r (?) ... no');
+    error('test: rx == H_inv*W_r*Sx_r (?) ... no');
 end
 
 % Compressed sampling the signal
@@ -144,9 +193,9 @@ end
 
 % Link compressed covariance and vectorized cyclic spectrum 
 % 1 Phi*x*x'*Phi' = Phi*Rx*Phi' =y*y' = Cy; ..ok
-% 2. H*Rx_r' = W_r*Sx_r'; ..ok
-% 3. Cy_r' = kron(Phi,Phi)*Rx_r'; .. ok
-% so Cy_r' = kron(Phi,Phi)*H_inv*W_r*Rx_r', where Rx_r is sparse;
+% 2. H*rx' = W_r*Sx_r'; ..ok
+% 3. Cy_r' = kron(Phi,Phi)*rx'; .. ok
+% so Cy_r' = kron(Phi,Phi)*H_inv*W_r*rx', where rx is sparse;
 % Problem: sparse hat_m is not concentrated!
 
 cvx_begin
