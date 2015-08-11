@@ -4,6 +4,36 @@
   master
 v20150803143333
 v20150803144306
+commit 1e0cdd0032784298edd0fb59e0e0c7afa9584248
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 11 23:21:23 2015 +0800
+
+    final success, gen stable clean sparse feature, but with tricks: Qm Pn
+
+commit 91163a99347d4f087c548e6e46f3afd24f98711a
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 10 23:10:46 2015 +0800
+
+    update Pn, Qm, B. Pn, Qm is failed
+
+commit 19cc3705963cd5e3ad3e1555dbd884fd2cd50c6c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 10 22:32:54 2015 +0800
+
+    Pn, Qn, B generated in ref[1], eq(8), eq(43). B is verified
+
+commit 2baa92bd6a6f6f7cc8451855a1d9e038c7041c29
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 8 23:23:29 2015 +0800
+
+    add paper ref[1]
+
+commit b79b45da0a1713ad9d632ef9d388e72c60c76a44
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 8 23:19:00 2015 +0800
+
+    create test05, for real matrix in eq(9) and similar eq(7), but log: Cy_r = A*Sx_r (?) ... no
+
 commit 09ed0813a581fe35237b1df473276f759b9fcaf4
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Sat Aug 8 15:27:35 2015 +0800
