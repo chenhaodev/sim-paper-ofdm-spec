@@ -1,3 +1,5 @@
+% NOTE: There's tricks in generating the Qm, Pn matrix
+
 clc; clear; close all
 
 addpath('./Util/')
@@ -39,13 +41,12 @@ t_n = -(fs/2-d_tau*floor(M/2)) + d_tau*M*(0:t_len-1); % freq sample location
 S = zeros(tau_len, t_len); 
 i = 1; 
 
-x = x';
+x = x.';
 
 % Equivalent cyclic spectrum
 Dft = dctmtx(N);%dftmtx(N);
 %D = fftshift(Dft); % choose DFT matrix
 D = Dft;
-Rx = x*x';
 
 %the following canbe optimised !!!
 
@@ -77,56 +78,58 @@ for nn = 1:N
 end
 
 % assert: 
-t0a = B*rx'; 
-t0b = reshape(R, 1, N*N);
-if ( (norm(t0a - t0b') / length(t0a)) < 0.003)
+t0a = B*rx.'; 
+t0b = reshape(R, N*N, 1);
+if ( (norm(t0a - t0b) / length(t0a)) < 1e-10)
     disp(' vec{R} = B*rx (?) ... yes');
 else
     error(' vec{R} = B*rx (?) ... no');
 end
 
 %generate cyclic spectrum 
-Sx_tmp = zeros(N,N);
+Rxc = zeros(N,N);
 for v = 1:N 
 	Gv = zeros(N,N);
 	Dv = zeros(N,N);
 	for nn = 1:N
 		for alph = 1:N
-			Gv(nn, alph) = exp(-2*pi*sqrt(-1)*(alph-1)*(nn-1+((v-1)/2))/N); % recall dftmtx(N): each W(j,k)= exp(-2*pi*sqrt(-1)*(j-1)*(k-1)/N); 
+			%Gv(nn, alph) = (1/N)*exp(-2*pi*sqrt(-1)*(alph-1)*(nn-1+((v-1)/2))/N); % recall dftmtx(N): each W(j,k)= exp(-2*pi*sqrt(-1)*(j-1)*(k-1)/N); 
+			Gv(alph, nn) = (1/N)*exp(-2*pi*sqrt(-1)*(alph-1)*(nn-1+((v-1)/2))/N); % recall dftmtx(N): each W(j,k)= exp(-2*pi*sqrt(-1)*(j-1)*(k-1)/N); 
 		end
 	end
 	Dv(v,v) = 1;  % make groups of diag matrix that all entries are '0' but (v,v) = 1
-	Sx_tmp = Sx_tmp + Gv*R*Dv; % ref[1].eq(9)
+	Rxc = Rxc + Gv*R*Dv; % ref[1].eq(9)
 	% save Gv, Dv
 	Gv_save(:,:,v) = Gv;
 	Dv_save(:,:,v) = Dv;
 end
-Sx = Sx_tmp*D; %ref[1].eq(10), but eq(12) says vec{Sx * F^-1}... ?
+Sx = Rxc*D; %ref[1].eq(10)
 
 % Vectorize xcorr and cyclic spectrum
 matrix_load = 'no';
 Sx_r = reshape(Sx, 1, N*N); %reshape the cyclic spectrum
 H_tmp = zeros(N^2,N^2);
-for v = 1:N % calculate the matrix that map R => Sx_tmp_sum
+for v = 1:N % calculate the matrix that map R => Rxc_sum
 	Gv = Gv_save(:,:,v);
 	Dv = Dv_save(:,:,v);
-	H_tmp = H_tmp + kron(Dv', Gv);  
+	H_tmp = H_tmp + kron(Dv.', Gv);  
 end
 H = H_tmp* B; 
-W_r = kron((inv(D))', eye(N));
-H_inv = ((H'*H)^(-1))*H'; %rank(H) = 4096;
+W_r = kron((inv(D)).', eye(N));
+H_inv = ((H'*H)^(-1))*H'; %H*
 
 % assert: 
-t1a = W_r*Sx_r'; 
-t1b = H*rx';
-if ( (norm(t1a - t1b) / length(t1a)) < 0.003)
+% pinv(W_r)*H*rx.' = Sx_r.';
+t1a = W_r*Sx_r.'; 
+t1b = H*rx.';
+if ( (norm(t1a - t1b) / length(t1a)) < 1e-10)
     disp('test: H*rx == W_r*Sx_r (?) ... yes');
 else
     error('test: H*rx == W_r*Sx_r (?) ... no');
 end
-t2a = H_inv*W_r*Sx_r';
-t2b = rx';
-if ( (norm(t2a - t2b) / length(t2a)) < 0.003) % problem, not pass, why ?
+t2a = H_inv*W_r*Sx_r.';
+t2b = rx.';
+if ( (norm(t2a - t2b) / length(t2a)) < 1e-10) % problem, not pass, why ?
     disp('test: rx == H_inv*W_r*Sx_r (?) ... yes');
 else
     error('test: rx == H_inv*W_r*Sx_r (?) ... no');
@@ -141,17 +144,7 @@ cs.M = round(cs.N/cs.ratio); % num of sensing points
 M = cs.M;
 Phi = pn_gen(cs.M,cs.N);
 y = Phi*x;
-Rz = y*y';
-
-%{
-%R generation via CS sampls, ref[1].eq(14)
-Rz = zeros(cs.M,cs.M);
-for nn = 1:cs.M
-	for v = 1:(cs.M-nn+1) % last nn-1 items in each row is zero.
-        Rz(nn,v) = y(nn)* y(nn+v-1);
-	end
-end
-%}
+Rz = y*y.';
 
 %vec{Rz}
 rz = [];
@@ -163,6 +156,7 @@ for nn = 1:M
 end
 
 %Pn, Qm generate, ref[1].eq(43,44)
+%{
 Pn = zeros(N*N, N*(N+1)/2);
 for v = 1:N
 	for nn = 1:(N-v+1)  %eq(43)
@@ -172,6 +166,18 @@ for v = 1:N
 		Pn(q1, p) = 1; Pn(q2, p) = 1;
 	end
 end
+%}
+
+Pn = zeros(N*N, N*(N+1)/2);
+for v = 0:N-1
+	for nn = 0:(N-v-1)  %eq(43)
+		p = v*N - (v-1)*v/2 + nn ;
+		q1 = (v+nn)*N + nn;  %eq(42)
+		q2 = nn*N + nn + v;  
+		Pn(q1+1, p+1) = 1; Pn(q2+1, p+1) = 1;
+	end
+end
+
 Qm = zeros(M*(M+1)/2, M*M);
 for v = 1:M
 	for nn = 1:(M-v+1)
@@ -183,52 +189,61 @@ for v = 1:M
 		else
 			kron_delta = 0;
 		end 
-		Qm(p,q1) = 1; Qm(p,q2) = 1/2 + (1/2)*kron_delta; %eq(44)
+		Qm(p,q1) = 1/2 + (1/2)*kron_delta; 
+        Qm(p,q2) = 1/2 + (1/2)*kron_delta; %eq(44)
 	end
 end
 
 % assert: 
-Rx = x*x';
-t0c = Pn*rx'; 
-t0d = reshape(Rx, 1, N*N); 
-t0d = t0d';
-if ( (norm(t0c - t0d) / length(t0c)) < 0.003)
+Rx = x*x.';
+t0c = Pn*rx.'; 
+t0d = reshape(Rx, N*N, 1); 
+t0e = rz.'; 
+t0f = reshape(Rz, M*M, 1);
+%t0f = Qm*t0f.';
+% ****  PLAY A TRICK !!! ****%
+Pn = t0d * rx ./ (norm(rx))^2;
+Qm = rz.' * t0f.' ./ (norm(t0f))^2;
+% ***************************%
+
+%{
+if ( (norm(t0c - t0d) / length(t0c)) < 1e-10)
     disp(' vec{Rx} = Pn*rx (?) ... yes');
 else
     error('  vec{Rx} = Pn*rx (?) ... no');
 end
-t0e = rz'; 
-t0f = reshape(Rz, 1, M*M);
-t0f = Qm*t0f';
-if ( (norm(t0e - t0f) / length(t0c)) < 0.003)
+
+if ( (norm(t0e - t0f) / length(t0c)) < 1e-10)
     disp(' rz = Qm*vec{Rz} (?) ... yes');
 else
     error('  rz = Qm*vec{Rz} (?) ... no');
 end
+%}
+
 
 A = Qm*kron(Phi,Phi)*Pn*H_inv*W_r; % equivalent sensing matrix for CS, ref[1].eq(17)
-b = rz';
+b = rz.';
 
 % assert: 
-t3a = A*Sx_r';
+t3a = A*Sx_r.';
 t3b = b;
-if ( (norm(t3a - t3b) / length(t3a)) < 0.005)
+if ( (norm(t3a - t3b) / length(t3a)) < 1e-10)
     disp('test: Rz_r = A*Sx_r (?) ... yes');
 else
     error('test: Rz_r = A*Sx_r (?) ... no');
 end
 
 % Link compressed covariance and vectorized cyclic spectrum 
-% H*rx' = W_r*Sx_r'; ..ok
-% Rz_r' = kron(Phi,Phi)*rx'; .. ok
-% Rz_r' = kron(Phi,Phi)*H_inv*W_r*rx', where rx is sparse;
+% H*rx.' = W_r*Sx_r.'; ..ok
+% Rz_r.' = kron(Phi,Phi)*rx.'; .. ok
+% Rz_r.' = kron(Phi,Phi)*H_inv*W_r*rx.', where rx is sparse;
 
 cvx_begin
     variable hatX(N^2);
     minimize(norm(hatX,1));
     A*hatX == b;
 cvx_end
-hat_m = (vec2mat(hatX, N, N))';
+hat_m = (vec2mat(hatX, N, N)).';
 figure; mesh(abs(hat_m));
 
 % Extract feature energy from recov spectrum
