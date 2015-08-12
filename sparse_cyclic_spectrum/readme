@@ -4,6 +4,18 @@
   master
 v20150803143333
 v20150803144306
+commit c4578bdfe94a8aedacca9180119d6b448864ce84
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 12 21:04:27 2015 +0800
+
+    Qm Pn suc, program suc, and gen stable clean sparse feature
+
+commit 5b872a0f25fc5b0a27951d673d96e3390c606e27
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 11 23:21:46 2015 +0800
+
+    update readme
+
 commit 1e0cdd0032784298edd0fb59e0e0c7afa9584248
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Tue Aug 11 23:21:23 2015 +0800
