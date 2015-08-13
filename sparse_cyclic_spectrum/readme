@@ -4,6 +4,18 @@
   master
 v20150803143333
 v20150803144306
+commit 29d32f42b64dbf3089f5be2bafc8c2b84fa0b1ac
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 10:25:25 2015 +0800
+
+    suc recov, pattern disp; but not very diff from noise recov, need further process for GLRT and CS-cov-thres
+
+commit be3a117da9517ddbc6ec910d5d82548055f7c39c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 12 21:04:49 2015 +0800
+
+    update readme
+
 commit c4578bdfe94a8aedacca9180119d6b448864ce84
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Wed Aug 12 21:04:27 2015 +0800
