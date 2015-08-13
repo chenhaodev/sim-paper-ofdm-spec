@@ -1,5 +1,3 @@
-% NOTE: There's tricks in generating the Qm, Pn matrix
-
 clc; clear; close all
 
 addpath('./Util/')
@@ -21,8 +19,8 @@ else
 end
 
 if strcmpi(mtx.load, 'yes')
-    load cached_matrix.mat 
-    disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
+	load cached_matrix.mat 
+	disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
 end
 
 %sig.x=(randn(1,64)); 
@@ -32,6 +30,8 @@ sig.N = length(sig.x);
 fs = sig.fs;
 N = sig.N;
 x = sig.x;
+
+M = 1;
 
 x = x.';
 
@@ -220,8 +220,8 @@ cvx_begin
     minimize(norm(hatX,1));
     A*hatX == b;
 cvx_end
-%threshold = 0.001;
-%inx = find(hatX < threshold); hatX(inx) = 0;
+threshold = 0.001;
+inx = find(hatX < threshold); hatX(inx) = 0;
 hat_m = (vec2mat(hatX, N, N)).';
 figure; mesh(abs(hat_m));
 

@@ -2,9 +2,16 @@
   cs_spec_xcorr_v20150803143333
   cs_xcorr_vector
   master
+log
 v20150803143333
 v20150803144306
 v20150813151310
+commit 92aaa66226c3291ac70de38373785f7413b8a981
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 22:50:40 2015 +0800
+
+    quick test core based on v20150813151310, disp_sparse....
+
 commit 89eb6132ce87dcb322e8d5977e0cf59fc30ecd1a
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Thu Aug 13 16:32:33 2015 +0800
