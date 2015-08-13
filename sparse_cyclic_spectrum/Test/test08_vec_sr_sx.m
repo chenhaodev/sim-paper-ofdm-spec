@@ -11,7 +11,7 @@ addpath('./Data/')
 sig.type = 'fsk'; % 'fsk'
 sig.fs = 1;
 sig.M = 1;
-mtx.load = 'no';
+mtx.load = 'yes';
 
 if strcmpi(sig.type,'fsk') % default signal
 	load fsk.mat
@@ -21,8 +21,8 @@ else
 end
 
 if strcmpi(mtx.load, 'yes')
-    load test07_mtx.mat
-    disp('load matrix: H W_r H_inv B Pn Qm')
+    load cached_matrix.mat 
+    disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
 end
 
 %sig.x=(randn(1,64)); 
@@ -32,27 +32,10 @@ sig.N = length(sig.x);
 fs = sig.fs;
 N = sig.N;
 x = sig.x;
-opt1 = 'show';
-
-M = 1;
-
-d_tau = fs/N; % time resolution
-tau = 0:d_tau:fs-d_tau; % delay resolution
-tau_len = length(tau); 
-
-t_len = floor(N/M-1)+1; 
-t_n = -(fs/2-d_tau*floor(M/2)) + d_tau*M*(0:t_len-1); % freq sample location
-
-S = zeros(tau_len, t_len); 
-i = 1; 
 
 x = x.';
 
 % Equivalent cyclic spectrum
-%Dft = dctmtx(N);%dftmtx(N);
-%D = fftshift(Dft); % choose DFT matrix
-
-%the following canbe optimised !!!
 
 %rx generate, ref[1].eq(8)
 rx = [];
@@ -237,8 +220,8 @@ cvx_begin
     minimize(norm(hatX,1));
     A*hatX == b;
 cvx_end
-threshold = 0.001;
-inx = find(hatX < threshold); hatX(inx) = 0;
+%threshold = 0.001;
+%inx = find(hatX < threshold); hatX(inx) = 0;
 hat_m = (vec2mat(hatX, N, N)).';
 figure; mesh(abs(hat_m));
 

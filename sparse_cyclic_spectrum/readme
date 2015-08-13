@@ -4,6 +4,19 @@
   master
 v20150803143333
 v20150803144306
+v20150813151310
+commit 89eb6132ce87dcb322e8d5977e0cf59fc30ecd1a
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 16:32:33 2015 +0800
+
+    verified suc (real/imag), rz = A*Sx_r. so all verified, tagged
+
+commit 499588e6448be495820074063311d41a8dabfe01
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 10:25:44 2015 +0800
+
+    update readme
+
 commit 29d32f42b64dbf3089f5be2bafc8c2b84fa0b1ac
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Thu Aug 13 10:25:25 2015 +0800
