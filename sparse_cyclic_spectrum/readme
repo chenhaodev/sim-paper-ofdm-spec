@@ -6,6 +6,24 @@ log
 v20150803143333
 v20150803144306
 v20150813151310
+commit cab0f865ed32c5311ea93be207a6deea8d786255
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 16 21:51:35 2015 +0800
+
+    disp_sparse_cyclic_spec(): shifted feature & feature mask; roc v.s in ed, csd, cs-csd
+
+commit a61ece84206e1a9e6664418726cf18f7d8f5e401
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 15 22:25:28 2015 +0800
+
+    more clear feature; rd mtx; test bpsk, ofdm(fail, but R is sparse) ...
+
+commit 082afbdcd0ed36cf74e289c4266ae3bf43ed9bed
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 23:08:53 2015 +0800
+
+    update
+
 commit 92aaa66226c3291ac70de38373785f7413b8a981
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Thu Aug 13 22:50:40 2015 +0800
