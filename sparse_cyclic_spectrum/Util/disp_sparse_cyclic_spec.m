@@ -1,22 +1,21 @@
+function [hat_m_M, Sx_M, feature_mask] = disp_sparse_cyclic_spec(x)
+% ***********NOTE**************%
+%{
 clc; clear; close all
-
 addpath('./Util/')
 addpath('./Data/')
-
+%}
 % Header 
-
-sig.type = 'fsk'; % 'fsk'
-
-load fsk.mat
-sig.x = fsk_real(1:64);
+%load gain_attr.mat
+%disp('load gain_attr: gain.noise gain.sig snr_dB')
+%load bpsk.mat
+%x = bpsk(1:64);
+load Phi_16_64.mat
 load cached_matrix.mat 
-disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
+%disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
 
-%sig.x=(randn(1,64)); 
-
-sig.x = sig.x ./ norm(sig.x);
-N = length(sig.x);
-x = sig.x;
+N = length(x);
+%x= gain.sig.*x + gain.noise.*(randn(1,N)); 
 
 x = x.';
 
@@ -58,7 +57,8 @@ cs.iter = 100;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio); % num of sensing points
 M = cs.M;
-Phi = pn_gen(cs.M,cs.N);
+load Phi_16_64.mat
+%Phi = pn_gen(cs.M,cs.N);
 y = Phi*x;
 Rz = y*y.';
 
@@ -76,11 +76,13 @@ b = rz.';
 % assert: 
 t3a = A*Sx_r.';
 t3b = b;
+%{
 if (norm(imag(t3a)-imag(t3b)) < 1e-10) && (norm(real(t3a)-real(t3b)) < 1e-10)
     disp('test: Rz_r = A*Sx_r (?) ... yes');
 else
     error('test: Rz_r = A*Sx_r (?) ... no');
 end
+%}
 
 % Link compressed covariance and vectorized cyclic spectrum 
 % H*rx.' = W_r*Sx_r.'; ..ok
@@ -97,9 +99,28 @@ cvx_end
 %threshold = 0.001;
 %inx = find(hatX < threshold); hatX(inx) = 0;
 %}
+
 hat_m = (vec2mat(hatX, N, N)).';
-figure; mesh(abs(hat_m));
+shift = 6;
+hat_m_M = [hat_m(:, ((end-shift):end)) hat_m(:, (1:(end-shift-1)))];
+Sx_M = [Sx(:, ((end-shift):end)) Sx(:, (1:(end-shift-1)))];
 
 % Extract feature energy from recov spectrum
-%[out] = feature_extract(abs(hat_m), 1:N, 0.2, 1:N, 0.2);
-%norm(out)
+feature_mask = ones(N,N);
+for i = 0:N-1
+    for j = 0:N-1
+        if (j > 2*i) || (j < 2*i -N/2)
+            feature_mask(j+1,i+1) = 0;
+        end
+    end
+end
+
+%{
+figure; 
+subplot(2,1,1); mesh(abs(Sx_M));
+subplot(2,1,2); mesh(abs(hat_m_M));
+
+figure;
+subplot(2,1,1); mesh(feature_mask.*abs(Sx_M));
+subplot(2,1,2); mesh(feature_mask.*abs(hat_m_M));
+%}

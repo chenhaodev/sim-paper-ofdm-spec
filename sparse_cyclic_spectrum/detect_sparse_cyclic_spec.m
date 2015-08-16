@@ -11,58 +11,89 @@ addpath('./Util/')
 addpath('./Data/')
 
 % Header 
-
-sig.type = 'fsk'; % 'fsk'
-sig.fs = 1;
-sig.M = 1;
-
-if strcmpi(sig.type,'fsk') % default signal
-	load fsk.mat             
-else
-	error('signal type not exist!!');
-end
-
-sig.x = fsk_real(1:64);
-sig.x = sig.x ./ norm(sig.x);
-%sig.x = fsk_real(65:128);
-sig.N = length(sig.x);
-
-Pf = 0.01:0.01:1; % Pf = Probability of False Alarm
-iter = 20; % Monte Carlo simulation
-
-Pf = 0.01:0.01:1; % Pf = Probability of False Alarm
-
-snr_dB = 5; % SNR in decibels, NOTE !!!!
+snr_dB = 0; % SNR in decibels, NOTE !!!! %CS-CSD > 5
 snr = 10.^(snr_dB./10); % Linear Value of SNR
-load ./Data/thres_sparse_cyclic_spec.mat %thres_sparse_cyclic_spec_est
+gain.sig = sqrt(snr);
+gain.noise = 1;
 
-for m = 1:length(Pf)
-    m
-    i = 0;
-	for kk=1:iter % Number of Monte Carlo Simulations
-		% noise
-		n= randn(1,sig.N); 
-		% pu signal
-        s = sig.x;
-        x = sqrt(snr).*s + n; 
-		% test, cs_cyc_spec + feature extract
-		[hat_spec] = sparse_cyclic_spec(sig.x, sig.N, sig.fs, 'non-show');
-		[out] = feature_extract(abs(hat_spec), 1:sig.N, 0.2, 1:sig.N, 0.2);
-        energy_fin = (1/length(L)).*norm(out);% feature-power, test statistic (normlized)
-		thresh(m) = thres_sparse_cyclic_spec_est(m); %use estimated threshold 
-		if(energy_fin >= thresh(m))  
-			i = i+1;
-		end
+iter = 25; % Monte Carlo simulation
+
+load bpsk.mat
+mm = 1;
+%for thresh = 20%5:2:20 %CS-CSD, 5db
+%for thresh = 10:2:30 %CSD
+for thresh = 30:5:50 %ED
+    thresh 
+    for kk=1:iter % Number of Monte Carlo Simulations
+        % signal exist 
+        x = bpsk(1:64); N = length(x);
+        x= gain.sig.*x + gain.noise.*(randn(1,N)); 
+        % signal non-exist 
+        n= gain.noise.*(randn(1,N));
+        
+        %{
+        % test with signal exist
+        ed_sig(kk) = (1/length(N)).*norm(x);
+        % test with signal non-exist (noise)
+        ed_nos(kk) = (1/length(N)).*norm(n);
+        %}
+        
+        %{
+        % test with signal exist
+        [hat_m_M1, Sx_M1, feature_mask] = disp_sparse_cyclic_spec(x);
+        out1 = feature_mask.*abs(Sx_M1);
+        csd_sig(kk) = (1/length(N)).*norm(out1);
+        % test with signal non-exist (noise)
+        [hat_m_M2, Sx_M2, feature_mask] = disp_sparse_cyclic_spec(n);
+        out2 = feature_mask.*abs(Sx_M2);
+        csd_nos(kk) = (1/length(N)).*norm(out2);
+        %}
+        
+        % test with signal exist
+        [hat_m_M1, Sx_M1, feature_mask] = disp_sparse_cyclic_spec(x);
+        out1 = feature_mask.*abs(hat_m_M1);
+        cs_csd_sig(kk) = (1/length(N)).*norm(out1);
+        % test with signal non-exist (noise)
+        [hat_m_M2, Sx_M2, feature_mask] = disp_sparse_cyclic_spec(n);
+        out2 = feature_mask.*abs(hat_m_M2);
+        cs_csd_nos(kk) = (1/length(N)).*norm(out2);
+        
     end
-    Pd_sparse_cyclic_spec(m) = i/kk; 
-end
-plot(Pf, Pd_sparse_cyclic_spec, '*r'); hold on; 
-save ./Data/Pd_sparse_cyclic_spec.mat Pd_sparse_cyclic_spec 
-% energy(object) is different, make them all detecting fsk signal, then compare them @ the same SNR
-%load ./Data/ed_ofdm_sys.mat
-%plot(Pf, Pd_rnd, 'ob'); hold on;
-%plot(Pf, Pd_ofdm, '.y'); hold on;
-%plot(Pf, Pd_ofdm_th_est, '.g'); hold on;
-%legend('ROC of FD for OFDM using estimated threshold','ROC of ED for random signal', 'ROC of ED for OFDM', 'ROC of ED for OFDM using estimated threshold');
-xlabel('Pf');
+    % Pd, Pfa
+    
+    %{
+    ed_pd_num = length(find(ed_sig >= thresh));
+    ed_pfa_num = length(find(ed_nos >= thresh));
+    Pd_ed(mm) = ed_pd_num/iter;
+    Pfa_ed(mm) = ed_pfa_num/iter;
+    %}
+    
+    %{
+    csd_pd_num = length(find(csd_sig >= thresh));
+    csd_pfa_num = length(find(csd_nos >= thresh));
+    Pd_csd(mm) = csd_pd_num/iter;
+    Pfa_csd(mm) = csd_pfa_num/iter;
+    %}
+    
+    cs_csd_pd_num = length(find(cs_csd_sig >= thresh));
+    cs_csd_pfa_num = length(find(cs_csd_nos >= thresh));
+    Pd_cs_csd(mm) = cs_csd_pd_num/iter;
+    Pfa_cs_csd(mm) = cs_csd_pfa_num/iter;
+    
+    mm = mm +1;
+end 
+%[~, inx_ed] = sort(Pfa_ed);
+%[~, inx_csd] = sort(Pfa_csd);
+[~, inx_cs_csd] = sort(Pfa_cs_csd);
+
+figure; 
+%plot(sort(Pfa_ed), Pd_ed(inx_ed), '*r'); hold on;
+%plot(sort(Pfa_csd), Pd_csd(inx_csd), '*g');
+plot(sort(Pfa_cs_csd), Pd_cs_csd(inx_cs_csd), '*g');
+
+%save roc_ed_0db.mat Pfa_ed Pd_ed
+%save roc_csd_0db.mat Pfa_csd Pd_csd
+save roc_cs_csd_0db.mat Pfa_cs_csd Pd_cs_csd
+
+xlabel('Pfa');
 ylabel('Pd');
