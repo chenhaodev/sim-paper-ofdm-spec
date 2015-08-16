@@ -22,7 +22,7 @@ load bpsk.mat
 mm = 1;
 %for thresh = 20%5:2:20 %CS-CSD, 5db
 %for thresh = 10:2:30 %CSD
-for thresh = 30:5:50 %ED
+for thresh = 20:5:50 %ED
     thresh 
     for kk=1:iter % Number of Monte Carlo Simulations
         % signal exist 

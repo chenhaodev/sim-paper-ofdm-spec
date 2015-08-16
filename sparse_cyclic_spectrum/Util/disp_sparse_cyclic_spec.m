@@ -10,7 +10,6 @@ addpath('./Data/')
 %disp('load gain_attr: gain.noise gain.sig snr_dB')
 %load bpsk.mat
 %x = bpsk(1:64);
-load Phi_16_64.mat
 load cached_matrix.mat 
 %disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
 
@@ -88,9 +87,8 @@ end
 % H*rx.' = W_r*Sx_r.'; ..ok
 % rz.' = Qm*kron(Phi,Phi)*Pn*rx.'; .. ok
 
-[hatX, ~] = cosamp(b, A, cs.sparse, cs.iter);
+%[hatX, ~] = cosamp(b, A, cs.sparse, cs.iter);
 
-%{
 cvx_begin
     variable hatX(N^2);
     minimize(norm(hatX,1));
@@ -98,7 +96,6 @@ cvx_begin
 cvx_end
 %threshold = 0.001;
 %inx = find(hatX < threshold); hatX(inx) = 0;
-%}
 
 hat_m = (vec2mat(hatX, N, N)).';
 shift = 6;
