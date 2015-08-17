@@ -20,9 +20,11 @@ iter = 25; % Monte Carlo simulation
 
 load bpsk.mat
 mm = 1;
-%for thresh = 20%5:2:20 %CS-CSD, 5db
+for thresh = 5:2:10 %CS-CSD_C, 0db
+%for thresh = 0:5:20 %CS-CSD_B, 0db
+%for thresh = 20:5:50 %CS-CSD_A, 0db
 %for thresh = 10:2:30 %CSD
-for thresh = 20:5:50 %ED
+%for thresh = 20:5:50 %ED
     thresh 
     for kk=1:iter % Number of Monte Carlo Simulations
         % signal exist 
@@ -93,7 +95,7 @@ plot(sort(Pfa_cs_csd), Pd_cs_csd(inx_cs_csd), '*g');
 
 %save roc_ed_0db.mat Pfa_ed Pd_ed
 %save roc_csd_0db.mat Pfa_csd Pd_csd
-save roc_cs_csd_0db.mat Pfa_cs_csd Pd_cs_csd
+save roc_cs_csd_0db_C.mat Pfa_cs_csd Pd_cs_csd
 
 xlabel('Pfa');
 ylabel('Pd');
