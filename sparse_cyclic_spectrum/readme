@@ -6,6 +6,30 @@ log
 v20150803143333
 v20150803144306
 v20150813151310
+commit db25ed9a16dd7c12ed1d8d400f783651616ac144
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 14:37:11 2015 +0800
+
+    try cvx recov instead of cosamp .. suc, ROC perform better; but still not much better than ED
+
+commit 90b9face2f7fddfbdea3d09dd52925408166c29f
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 00:52:31 2015 +0800
+
+    try cvx recov instead of cosamp
+
+commit 6873802964c467f5fa6b6470be778f4b0c4c2b70
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 16 22:05:11 2015 +0800
+
+    add test10 for new func disp_sparse_cyclic_spec(): shifted feature & feature mask;...
+
+commit 329215ed9841451ee70af39762fac52ad8b8471b
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 16 21:52:31 2015 +0800
+
+    update readme
+
 commit cab0f865ed32c5311ea93be207a6deea8d786255
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Sun Aug 16 21:51:35 2015 +0800
