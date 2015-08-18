@@ -1,19 +1,20 @@
+function [Test] = disp_sparse_cyclic_spec(x)
 % ***********NOTE**************%
-%function [hat_m_M, Sx_M, feature_mask] = disp_sparse_cyclic_spec(x)
+%{
 clc; clear; close all
 addpath('./Util/')
 addpath('./Data/')
-
+%}
 % Header 
-load gain_attr.mat
-disp('load gain_attr: gain.noise gain.sig snr_dB')
-load bpsk.mat
-x = bpsk(1:64);
+%load gain_attr.mat
+%disp('load gain_attr: gain.noise gain.sig snr_dB')
+%load bpsk.mat
+%x = bpsk(1:64);
 load cached_matrix.mat 
-disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
+%disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
 
 N = length(x);
-x= gain.sig.*x + gain.noise.*(randn(1,N)); 
+%x= gain.sig.*x + gain.noise.*(randn(1,N)); 
 
 x = x.';
 
@@ -56,7 +57,6 @@ cs.N = N;
 cs.M = round(cs.N/cs.ratio); % num of sensing points
 M = cs.M;
 load Phi_16_64.mat
-%Phi = pn_gen(cs.M,cs.N);
 y = Phi*x;
 Rz = y*y.';
 
@@ -74,12 +74,13 @@ b = rz.';
 % assert: 
 t3a = A*Sx_r.';
 t3b = b;
-
+%{
 if (norm(imag(t3a)-imag(t3b)) < 1e-10) && (norm(real(t3a)-real(t3b)) < 1e-10)
     disp('test: Rz_r = A*Sx_r (?) ... yes');
 else
     error('test: Rz_r = A*Sx_r (?) ... no');
 end
+%}
 
 % Link compressed covariance and vectorized cyclic spectrum 
 % H*rx.' = W_r*Sx_r.'; ..ok
@@ -87,55 +88,24 @@ end
 
 %[hatX, ~] = cosamp(b, A, cs.sparse, cs.iter);
 
-lambda_i = 1;
-for lambda = 0.1: 0.2: 2
-	cvx_begin
-		variable hatX(N^2);
-		minimize(lambda.*norm(hatX,1) + norm(b-A*hatX,2).^2);
-	cvx_end
-	hatX(lambda_i) = hatX;
-	lambda_i = lambda_i + 1;
-end 
-%threshold = 0.001;
-%inx = find(hatX < threshold); hatX(inx) = 0;
-
+lambda_opt = 0.05;
+cvx_begin
+	variable hatX(N^2);
+	minimize(lambda_opt.*norm(hatX,1) + norm(b-A*hatX)); %re. eq.21
+cvx_end
 hat_m = (vec2mat(hatX, N, N)).';
-shift = 6;
-hat_m_M = [hat_m(:, ((end-shift):end)) hat_m(:, (1:(end-shift-1)))];
-Sx_M = [Sx(:, ((end-shift):end)) Sx(:, (1:(end-shift-1)))];
-
-% Extract feature energy from recov spectrum
-feature_mask = ones(N,N);
-for i = 0:N-1
-    for j = 0:N-1
-        if (j > 2*i) || (j < 2*i -N/2)
-            feature_mask(j+1,i+1) = 0;
-        end
-    end
-end
 
 %CS based noise covariance
-L = 10; %test group number
-for l = 1:L
-	x(:,l)= gain.sig.*x + gain.noise.*(randn(1,N)); 
-	y(:,l) = Phi*x(:,l);
-	Rz_test(:,:,l) = y(:,l) * y(:,l)';
-	rz_test(:,l) = Qm*Rz_test(:,:,l);
-end
-rz_test_mean = (1/L).*sum(rz_test,2); 
-for l = 1:L
-	Sigma_z(:,:,l) = (rz_test_mean - rz_test(:,l)) * (rz_test_mean - rz_test(:,l))';
-end
-Sigma_z_mean = (1/L).*sum(Sigma_z,2); %eq.45
-T = inv(A'*A+lambda_opt.*eye(N^2)) * A';
-%J
-%Sigma
+load feature_matrix.mat %feature_mask Sigma J
 
+%{
 % Show
-figure; 
-subplot(2,1,1); mesh(abs(Sx_M));
-subplot(2,1,2); mesh(abs(hat_m_M));
+figure; mesh(abs(Sx));
+figure; mesh(abs(hat_m));
+figure; mesh(feature_mask.*abs(Sx));
+figure; mesh(feature_mask.*abs(hat_m));
+%}
 
-figure;
-subplot(2,1,1); mesh(feature_mask.*abs(Sx_M));
-subplot(2,1,2); mesh(feature_mask.*abs(hat_m_M));
+%Test-Statistic
+c = J*hatX;   % abs(vec2mat(c, N, N)).' = feature_mask.*abs(hat_m); .. ok
+Test = c'*Sigma*c;  
