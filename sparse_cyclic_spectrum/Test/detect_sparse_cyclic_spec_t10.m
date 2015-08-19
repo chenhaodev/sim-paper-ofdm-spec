@@ -42,21 +42,21 @@ for thresh = 5:2:10 %CS-CSD_C, 0db
         
         %{
         % test with signal exist
-        [hat_m_M1, Sx_M1, feature_mask] = disp_sparse_cyclic_spec(x);
+        [hat_m_M1, Sx_M1, feature_mask] = disp_sparse_cyclic_spec_t10(x);
         out1 = feature_mask.*abs(Sx_M1);
         csd_sig(kk) = (1/length(N)).*norm(out1);
         % test with signal non-exist (noise)
-        [hat_m_M2, Sx_M2, feature_mask] = disp_sparse_cyclic_spec(n);
+        [hat_m_M2, Sx_M2, feature_mask] = disp_sparse_cyclic_spec_t10(n);
         out2 = feature_mask.*abs(Sx_M2);
         csd_nos(kk) = (1/length(N)).*norm(out2);
         %}
         
         % test with signal exist
-        [hat_m_M1, Sx_M1, feature_mask] = disp_sparse_cyclic_spec(x);
+        [hat_m_M1, Sx_M1, feature_mask] = disp_sparse_cyclic_spec_t10(x);
         out1 = feature_mask.*abs(hat_m_M1);
         cs_csd_sig(kk) = (1/length(N)).*norm(out1);
         % test with signal non-exist (noise)
-        [hat_m_M2, Sx_M2, feature_mask] = disp_sparse_cyclic_spec(n);
+        [hat_m_M2, Sx_M2, feature_mask] = disp_sparse_cyclic_spec_t10(n);
         out2 = feature_mask.*abs(hat_m_M2);
         cs_csd_nos(kk) = (1/length(N)).*norm(out2);
         

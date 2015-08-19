@@ -6,6 +6,24 @@ log
 v20150803143333
 v20150803144306
 v20150813151310
+commit 12bc6ce92124e7ea942cf8a2d6c29ffda4eaf0ef
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 18 17:44:11 2015 +0800
+
+    l2+l1 recov, lambda opt, error covar cal .. seems ok
+
+commit f5d900030bb90288a1c4d8446f140c81646439c3
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 21:44:16 2015 +0800
+
+    add test11_vec_sr_sx.m for cvx l2-l1 lambda test, cs-covariance matrix gen
+
+commit 777f2963626d5fd5087bd516f21f2854099c57c4
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 14:37:59 2015 +0800
+
+    update readme
+
 commit db25ed9a16dd7c12ed1d8d400f783651616ac144
 Author: dreamclinger <chenhaomails@gmail.com>
 Date:   Mon Aug 17 14:37:11 2015 +0800

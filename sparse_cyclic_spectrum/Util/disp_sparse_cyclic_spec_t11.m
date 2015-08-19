@@ -1,15 +1,16 @@
-function [hat_m_M, Sx_M, feature_mask] = disp_sparse_cyclic_spec(x)
+function [Test] = disp_sparse_cyclic_spec_t11(x)
 % ***********NOTE**************%
 %{
+% Header 
 clc; clear; close all
 addpath('./Util/')
 addpath('./Data/')
+load gain_attr.mat
+disp('load gain_attr: gain.noise gain.sig snr_dB')
+load bpsk.mat
+x = bpsk(1:64);
 %}
-% Header 
-%load gain_attr.mat
-%disp('load gain_attr: gain.noise gain.sig snr_dB')
-%load bpsk.mat
-%x = bpsk(1:64);
+
 load cached_matrix.mat 
 %disp('load matrix: Gv_save Dv_save D H W_r H_inv B Pn Qm ')
 
@@ -57,7 +58,6 @@ cs.N = N;
 cs.M = round(cs.N/cs.ratio); % num of sensing points
 M = cs.M;
 load Phi_16_64.mat
-%Phi = pn_gen(cs.M,cs.N);
 y = Phi*x;
 Rz = y*y.';
 
@@ -75,49 +75,21 @@ b = rz.';
 % assert: 
 t3a = A*Sx_r.';
 t3b = b;
-%{
-if (norm(imag(t3a)-imag(t3b)) < 1e-10) && (norm(real(t3a)-real(t3b)) < 1e-10)
-    disp('test: Rz_r = A*Sx_r (?) ... yes');
-else
-    error('test: Rz_r = A*Sx_r (?) ... no');
-end
-%}
 
 % Link compressed covariance and vectorized cyclic spectrum 
 % H*rx.' = W_r*Sx_r.'; ..ok
 % rz.' = Qm*kron(Phi,Phi)*Pn*rx.'; .. ok
 
-%[hatX, ~] = cosamp(b, A, cs.sparse, cs.iter);
-
-cvx_begin
-    variable hatX(N^2);
-    minimize(norm(hatX,1));
-    A*hatX == b;
+lambda_opt = 0.05;
+cvx_begin quiet
+	variable hatX(N^2);
+	minimize(lambda_opt.*norm(hatX,1) + norm(b-A*hatX)); %re. eq.21
 cvx_end
-%threshold = 0.001;
-%inx = find(hatX < threshold); hatX(inx) = 0;
-
 hat_m = (vec2mat(hatX, N, N)).';
-shift = 6;
-hat_m_M = [hat_m(:, ((end-shift):end)) hat_m(:, (1:(end-shift-1)))];
-Sx_M = [Sx(:, ((end-shift):end)) Sx(:, (1:(end-shift-1)))];
 
-% Extract feature energy from recov spectrum
-feature_mask = ones(N,N);
-for i = 0:N-1
-    for j = 0:N-1
-        if (j > 2*i) || (j < 2*i -N/2)
-            feature_mask(j+1,i+1) = 0;
-        end
-    end
-end
+%CS based noise covariance
+load feature_matrix.mat %feature_mask Sigma J
 
-%{
-figure; 
-subplot(2,1,1); mesh(abs(Sx_M));
-subplot(2,1,2); mesh(abs(hat_m_M));
-
-figure;
-subplot(2,1,1); mesh(feature_mask.*abs(Sx_M));
-subplot(2,1,2); mesh(feature_mask.*abs(hat_m_M));
-%}
+%Test-Statistic
+c = J*hatX;   % abs(vec2mat(c, N, N)).' = feature_mask.*abs(hat_m); .. ok
+Test = c'*Sigma*c;  
