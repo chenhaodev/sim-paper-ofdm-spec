@@ -1,4 +1,4 @@
-function [Spec_t, t_n, tau] = cyclic_xcorr(x, N, fs, opt1)
+function [Spec_f_cs, Spec_f, f, alpha] = cs_cyclic_spectrum(x, N, fs, opt1)
 % x: signal (1 * N vector)
 % N: samples <= len(x) 
 % fs: sample rate
@@ -22,6 +22,8 @@ X = fftshift(fft(x(1:N)));
 X = X';
 x = x';
 
+%normal xcorr and cyclic_spec
+
 %% Loop
 for alfa = tau
 
@@ -40,38 +42,33 @@ for alfa = tau
 end
 
 Spec_t = abs(S);
-
-for ii = 1:N
-	%Y(ii,:) = simple_fft_tau(S(ii, :), N, tau);
-    Y(ii,:) = fftshift(fft(S(ii, :)));
-end
-for jj = 1:N
-	Z(:,jj) = fftshift(fft(Y(:, jj)));
-end
+%for ii = 1:N
+%	%Y(ii,:) = simple_fft_tau(S(ii, :), N, tau);
+%    Y(ii,:) = fftshift(fft(S(ii, :)));
+%end
+%for jj = 1:N
+%	Z(:,jj) = fftshift(fft(Y(:, jj)));
+%end
+D = dftmtx(N);
+W = D*S*D;
+Z = fftshift(W);
 Spec_f = abs(Z);
 
 % compressed xcorr
 cs.sparse = 16;
-cs.ratio = 16;
-cs.iter = 64;
+cs.ratio = 8;
+cs.iter = 32;
 cs.N = N;
 cs.M = round(cs.N/cs.ratio);
-<<<<<<< HEAD
-% sensing matrix 1
-%Phi = randn(cs.M,cs.N);
-% sensing matrix 2
-temp = toeplitz(randi([-1 1],1,cs.N));
-Phi = temp(1:cs.M, 1:cs.N);
-% sensing
-=======
 
 % sensing 1
 %Phi = randn(cs.M,cs.N);
+
 % sensing 2
 temp = toeplitz(randn(1,cs.N));
 Phi = temp(1:cs.M, 1:cs.N);
+Phi = Phi./norm(Phi);
 
->>>>>>> cs_spec_kron
 y = Phi*x;
 
 Sy = zeros(cs.M, cs.M); 
@@ -93,31 +90,53 @@ for alfa = tau(1:cs.M)
    	i = i+1;
 end
 
-<<<<<<< HEAD
-% sparse reconstruction 1
-A = Phi * dftmtx(cs.N);
+% sparse reconstruction 3, fails
+% S = DRD;
+% R = inv(D) S inv(D)
+% Rz = ARA'
+% Rz = A inv(D) S inv(D) A' ;
+% Rz * P = A inv(D) S, where P = pinv (inv(D) * A);
+
+% sparse recon 4, vec{} and kron{}, fails since memory full.
+
+% sparse recon 5, alternatively cosamp:
 for ii = 1:cs.M
-	[hat(:,ii), ~] = cosamp(Sy(:,ii), A, cs.sparse, cs.iter);
+    A= Phi*inv(D);
+    for iter = 1:2
+        if iter == 1    
+            b = Sy(:,ii); 
+        else
+            b = Sy(ii,:)';
+        end
+        cvx_begin
+            variable x(N);
+            minimize(norm(x,1));
+            A*x == b;
+        cvx_end
+        if iter == 1    
+            hat1(:,ii) = x';
+        else
+            hat2(ii,:) = x;
+        end 
+    end
+	%[hat1(:,ii), ~] = cosamp(Sy(:,ii), Phi*inv(D), 32, 100);
+	%[hat2(ii,:), ~] = cosamp(Sy(ii,:)', Phi*inv(D), 32, 100);
 end
-for jj = 1:cs.N
-	[W(jj,:), ~] = cosamp(hat(jj,:)', A, cs.sparse, cs.iter);
-end
-=======
-% sparse reconstruction 2
-Pre = Phi'*Sy*Phi;
-D = (dftmtx(cs.N))^(-1);
-for ii = 1:cs.N
-	[hat(:,ii), ~] = cosamp(Pre(:,ii), D, cs.sparse, cs.iter);
-end
-for jj = 1:cs.N
-	[W(jj,:), ~] = cosamp(hat(jj,:)', D, cs.sparse, cs.iter);
-end
-W = fftshift(W);
->>>>>>> cs_spec_kron
+W1 = fftshift(hat1);
+W2 = fftshift(hat2);
+W = W1 * W2;
 Spec_f_cs = abs(W);
 
 % figure
 if strcmpi(opt1,'show')
+	d_alpha = fs/N; % freq resolution
+	alpha = 0:d_alpha:fs-d_alpha; % cyclic resolution
+	a_len = length(alpha); 
+	f_len = floor(N/M-1)+1; 
+	f = -(fs/2-d_alpha*floor(M/2)) + d_alpha*M*(0:f_len-1); % freq sample location
+
+%normal xcorr and cyclic_spec
+
 	figure;
     mesh(t_n, tau, Spec_t); 
     axis tight;
@@ -135,29 +154,6 @@ if strcmpi(opt1,'show')
     mesh(f, alpha, Spec_f_cs); 
     axis tight;
     xlabel('f'); ylabel('a');    
+	%figure;
+	%plot(Spec_f_cs, '*');
 end
-
-%% sub functions %%
-
-function [z] = simple_fft_tau(in, N, tau)
-	nfft = N;
-	z=zeros(1,nfft);
-	Sum=0;
-	for kk=1:nfft
-	    for jj=1:N
-	        Sum=Sum+in(jj)*exp(-2*pi*sqrt(-1)*(jj-1)*(tau-1)/nfft);
-        end
-        z(kk)=Sum;
-    end
-
-function [z] = simple_fft_T(in, N, f)
-	nfft = N;
-	z=zeros(1,nfft);
-	Sum=0;
-	for kk=1:nfft
-	    for jj=1:N
-	        Sum=Sum+in(jj)*exp(-2*pi*sqrt(-1)*(jj-1)*(f-1)/nfft);
-        end
-        z(kk)=Sum;
-    end
-

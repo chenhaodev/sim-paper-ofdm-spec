@@ -1,3 +1,4 @@
+<<<<<<< HEAD
   cs_spec_kron
   cs_spec_xcorr_v20150803143333
   cs_xcorr_vector
@@ -23,6 +24,273 @@ Date:   Sun Aug 2 21:02:49 2015 +0800
     sparse recon2, fail
     
     	modified:   cyclic_xcorr.m
+=======
+* cs_spec_kron
+  cs_spec_xcorr_v20150803143333
+  cs_xcorr_vector
+  master
+log
+v20150803143333
+v20150803144306
+v20150813151310
+commit 12bc6ce92124e7ea942cf8a2d6c29ffda4eaf0ef
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 18 17:44:11 2015 +0800
+
+    l2+l1 recov, lambda opt, error covar cal .. seems ok
+
+commit f5d900030bb90288a1c4d8446f140c81646439c3
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 21:44:16 2015 +0800
+
+    add test11_vec_sr_sx.m for cvx l2-l1 lambda test, cs-covariance matrix gen
+
+commit 777f2963626d5fd5087bd516f21f2854099c57c4
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 14:37:59 2015 +0800
+
+    update readme
+
+commit db25ed9a16dd7c12ed1d8d400f783651616ac144
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 14:37:11 2015 +0800
+
+    try cvx recov instead of cosamp .. suc, ROC perform better; but still not much better than ED
+
+commit 90b9face2f7fddfbdea3d09dd52925408166c29f
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 17 00:52:31 2015 +0800
+
+    try cvx recov instead of cosamp
+
+commit 6873802964c467f5fa6b6470be778f4b0c4c2b70
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 16 22:05:11 2015 +0800
+
+    add test10 for new func disp_sparse_cyclic_spec(): shifted feature & feature mask;...
+
+commit 329215ed9841451ee70af39762fac52ad8b8471b
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 16 21:52:31 2015 +0800
+
+    update readme
+
+commit cab0f865ed32c5311ea93be207a6deea8d786255
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 16 21:51:35 2015 +0800
+
+    disp_sparse_cyclic_spec(): shifted feature & feature mask; roc v.s in ed, csd, cs-csd
+
+commit a61ece84206e1a9e6664418726cf18f7d8f5e401
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 15 22:25:28 2015 +0800
+
+    more clear feature; rd mtx; test bpsk, ofdm(fail, but R is sparse) ...
+
+commit 082afbdcd0ed36cf74e289c4266ae3bf43ed9bed
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 23:08:53 2015 +0800
+
+    update
+
+commit 92aaa66226c3291ac70de38373785f7413b8a981
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 22:50:40 2015 +0800
+
+    quick test core based on v20150813151310, disp_sparse....
+
+commit 89eb6132ce87dcb322e8d5977e0cf59fc30ecd1a
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 16:32:33 2015 +0800
+
+    verified suc (real/imag), rz = A*Sx_r. so all verified, tagged
+
+commit 499588e6448be495820074063311d41a8dabfe01
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 10:25:44 2015 +0800
+
+    update readme
+
+commit 29d32f42b64dbf3089f5be2bafc8c2b84fa0b1ac
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 13 10:25:25 2015 +0800
+
+    suc recov, pattern disp; but not very diff from noise recov, need further process for GLRT and CS-cov-thres
+
+commit be3a117da9517ddbc6ec910d5d82548055f7c39c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 12 21:04:49 2015 +0800
+
+    update readme
+
+commit c4578bdfe94a8aedacca9180119d6b448864ce84
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 12 21:04:27 2015 +0800
+
+    Qm Pn suc, program suc, and gen stable clean sparse feature
+
+commit 5b872a0f25fc5b0a27951d673d96e3390c606e27
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 11 23:21:46 2015 +0800
+
+    update readme
+
+commit 1e0cdd0032784298edd0fb59e0e0c7afa9584248
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 11 23:21:23 2015 +0800
+
+    final success, gen stable clean sparse feature, but with tricks: Qm Pn
+
+commit 91163a99347d4f087c548e6e46f3afd24f98711a
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 10 23:10:46 2015 +0800
+
+    update Pn, Qm, B. Pn, Qm is failed
+
+commit 19cc3705963cd5e3ad3e1555dbd884fd2cd50c6c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 10 22:32:54 2015 +0800
+
+    Pn, Qn, B generated in ref[1], eq(8), eq(43). B is verified
+
+commit 2baa92bd6a6f6f7cc8451855a1d9e038c7041c29
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 8 23:23:29 2015 +0800
+
+    add paper ref[1]
+
+commit b79b45da0a1713ad9d632ef9d388e72c60c76a44
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 8 23:19:00 2015 +0800
+
+    create test05, for real matrix in eq(9) and similar eq(7), but log: Cy_r = A*Sx_r (?) ... no
+
+commit 09ed0813a581fe35237b1df473276f759b9fcaf4
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sat Aug 8 15:27:35 2015 +0800
+
+    revise mtx H, but Sth wrong here, since Eye_tmp(k,k) should correspond to G(k), while we use D instead.
+
+commit 6d9b2267118987f44ff7da57cc1ca53b2b03764f
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 6 15:42:27 2015 +0800
+
+    create assert()
+
+commit 622ffc54781d20b014b210348392a0192dadda18
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 6 13:35:49 2015 +0800
+
+    updated gitignore
+
+commit 4358616ed874717892bf3750d000a57f36918c00
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Thu Aug 6 13:19:57 2015 +0800
+
+    since recon-spec not foucs via DCTmtx... try DFTmtx to solve it(maybe is not sparse enough)
+
+commit 550cb44884ddfe278c85961e6a8b7aa2838d9fba
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 5 13:45:01 2015 +0800
+
+    although recon-spec not foucs... fixed Phi (sensing matrix) to assume it focused
+
+commit 4c9628128dda458dcd4ae64426d2040342383c4f
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Wed Aug 5 02:33:28 2015 +0800
+
+    cs.vec{xcorr} => cs.vec{Sf}.. sparse OK, but recon-spec not foucs..? (disp_sparse_...m)
+
+commit 960b23cd2119d9702ee38b2b82e942c8d3b07a70
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 22:15:08 2015 +0800
+
+    test02, testing ...
+
+commit c32581e5fd5d6db98c0b5775392beb531b34e13e
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 22:08:51 2015 +0800
+
+    updated: test01 vec{xcorr} => A vec{Sf}; test02: cs.vec{xcorr} => cs.vec{Sf}, testing .. focus on why Rz != ARA'
+
+commit 4b9dc68eaf2f17effc7477b575c87f3472df575b
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 15:28:29 2015 +0800
+
+    test01_vec_sr_sx.m updated
+
+commit d829fead63db751fc755d90ba4fde1eb02e317c1
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 14:21:04 2015 +0800
+
+    test vec{xcorr} => A vec{Sf} suc .. OK
+
+commit f9f293e3f61498d8c7c15cd3f73ff3f13a3195e7
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Tue Aug 4 12:59:48 2015 +0800
+
+    test_func scripts created
+
+commit 2a83e8d350eedd0d7d57826e18d9d0880cef96c0
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:28:21 2015 +0800
+
+    update
+
+commit cf9040687c70837b68869f7998c964393e54fb9a
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:23:56 2015 +0800
+
+    failed exp log, sparse_cyclic_spectrum
+
+commit f8f061e9f8cce25f692d23e24510e4dbe9c8e2cb
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:11:57 2015 +0800
+
+    update readme
+
+commit bb594660fd74cc052418bbaa9c8819c7389c363c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 22:11:37 2015 +0800
+
+    try alter recov by cvx/cosamp, fail; try 1 side recov (Rz*inv(D'A') = ADS), fail
+
+commit 3475fd7457576d19135592c608ceca9d197ec8dc
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 17:29:42 2015 +0800
+
+    create git readme
+
+commit a4bdc246c78824746465667b990b8ee75a1f9979
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 17:21:33 2015 +0800
+
+    create feature extraction, but fail to diff useful signal and noise
+
+commit 059c000ac0386cb60b2030713c7473cdee7bbcb3
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Mon Aug 3 14:36:53 2015 +0800
+
+    updated, sparse ok, but slow
+
+commit e2eaa89eec69dda0736e566b2681659fc52550ce
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 21:17:18 2015 +0800
+
+    sparse recon2 > recon1, but still not good enough
+
+commit f977f2bfbeb2211688803954bbd809db77853af8
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 21:14:29 2015 +0800
+
+    readme
+
+commit af106953d53be20356f79f15be7a76a9450c8f4c
+Author: dreamclinger <chenhaomails@gmail.com>
+Date:   Sun Aug 2 21:08:45 2015 +0800
+
+    sparse recon 2, try
+>>>>>>> cs_spec_kron
 
 commit 9e6271c3692feabbafa42045fe854a3599133fac
 Author: dreamclinger <chenhaomails@gmail.com>
